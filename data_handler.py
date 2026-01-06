@@ -21,7 +21,7 @@ def get_all_records():
         df['date'] = pd.to_datetime(df['date'])
         df = df.sort_values(by='date', ascending=False)
         # Convert date back to string for display if needed or keep as object
-        df['date'] = df['date'].dt.strftime('%Y-%m-%d')
+        df['date'] = df['date'].dt.strftime('%d/%m/%Y')
         return df.to_dict('records')
     except pd.errors.EmptyDataError:
         return []

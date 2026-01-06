@@ -16,6 +16,7 @@ class TestDataHandler(unittest.TestCase):
         self.assertEqual(len(records), 1)
         self.assertEqual(records[0]['eggs'], 5)
         self.assertEqual(records[0]['food_cost'], 2.5)
+        self.assertEqual(records[0]['date'], '01/10/2023')
 
     def test_get_record(self):
         rec_id = add_record('2023-10-01', 5, 2.5)
