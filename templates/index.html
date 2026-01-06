@@ -7,8 +7,19 @@
     </div>
 </div>
 
+<!-- Statistics Cards -->
 <div class="row mb-4">
-    <div class="col-md-4">
+    <!-- Chicken Stats -->
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-header">Aktueller Bestand</div>
+            <div class="card-body">
+                <h5 class="card-title">{{ stats.current_chickens }} Hühner</h5>
+            </div>
+        </div>
+    </div>
+    <!-- Egg Stats -->
+    <div class="col-md-3">
         <div class="card text-white bg-primary mb-3">
             <div class="card-header">Ø Eier / Tag</div>
             <div class="card-body">
@@ -16,19 +27,22 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <!-- Cost Efficiency -->
+    <div class="col-md-3">
         <div class="card text-white bg-success mb-3">
-            <div class="card-header">Ø Eier / Monat</div>
+            <div class="card-header">Kosten / Ei</div>
             <div class="card-body">
-                <h5 class="card-title">{{ stats.avg_eggs_month }}</h5>
+                <h5 class="card-title">{{ stats.cost_per_egg }} €</h5>
+                <small class="text-white">Prod. Kosten</small>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card text-white bg-info mb-3">
-            <div class="card-header">Ø Eier / Jahr</div>
+     <!-- Monthly Food Cost -->
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-header">Ø Futter / Monat</div>
             <div class="card-body">
-                <h5 class="card-title">{{ stats.avg_eggs_year }}</h5>
+                <h5 class="card-title">{{ stats.avg_food_cost_month }} €</h5>
             </div>
         </div>
     </div>
@@ -36,19 +50,19 @@
 
 <div class="row mb-4">
     <div class="col-md-6">
-        <div class="card text-white bg-warning mb-3">
-            <div class="card-header">Ø Futterkosten / Monat</div>
+         <div class="card bg-light mb-3">
+            <div class="card-header">Jahresstatistik (Futter)</div>
             <div class="card-body">
-                <h5 class="card-title">{{ stats.avg_cost_month }} €</h5>
+                <p>Gesamtkosten Futter: {{ stats.total_food_cost }} €</p>
             </div>
         </div>
     </div>
     <div class="col-md-6">
         <div class="card bg-light mb-3">
-            <div class="card-header">Gesamtstatistik</div>
+            <div class="card-header">Jahresstatistik (Hühner)</div>
             <div class="card-body">
+                <p>Gesamtkosten Hühner: {{ stats.total_chicken_cost }} €</p>
                 <p>Gesamt Eier: {{ stats.total_eggs }}</p>
-                <p>Gesamtkosten: {{ stats.total_cost }} €</p>
             </div>
         </div>
     </div>
@@ -56,39 +70,119 @@
 
 <div class="row">
     <div class="col-md-6">
-        <h3>Tageseintrag hinzufügen</h3>
-        <form action="{{ url_for('add') }}" method="POST">
-            <div class="mb-3">
-                <label for="date" class="form-label">Datum</label>
-                <input type="date" class="form-control" id="date" name="date" required>
+        <h3>Eintrag hinzufügen</h3>
+
+        <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="eggs-tab" data-bs-toggle="tab" data-bs-target="#eggs" type="button" role="tab">Eier</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="food-tab" data-bs-toggle="tab" data-bs-target="#food" type="button" role="tab">Futter</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="chicken-tab" data-bs-toggle="tab" data-bs-target="#chicken" type="button" role="tab">Hühner</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="myTabContent">
+            <!-- Egg Form -->
+            <div class="tab-pane fade show active" id="eggs" role="tabpanel">
+                <form action="{{ url_for('add') }}" method="POST">
+                    <input type="hidden" name="type" value="egg">
+                    <div class="mb-3">
+                        <label class="form-label">Datum</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Anzahl Eier</label>
+                        <input type="number" class="form-control" name="amount" required min="0">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Eier eintragen</button>
+                </form>
             </div>
-            <div class="mb-3">
-                <label for="eggs" class="form-label">Gelegte Eier</label>
-                <input type="number" class="form-control" id="eggs" name="eggs" required min="0">
+
+            <!-- Food Form -->
+            <div class="tab-pane fade" id="food" role="tabpanel">
+                <form action="{{ url_for('add') }}" method="POST">
+                    <input type="hidden" name="type" value="food">
+                    <div class="mb-3">
+                        <label class="form-label">Datum</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kosten (€)</label>
+                        <input type="number" step="0.01" class="form-control" name="cost" required min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notiz (z.B. Menge/Marke)</label>
+                        <input type="text" class="form-control" name="note" placeholder="z.B. 25kg Sack">
+                    </div>
+                    <button type="submit" class="btn btn-warning">Futterkauf eintragen</button>
+                </form>
             </div>
-            <div class="mb-3">
-                <label for="food_cost" class="form-label">Futterkosten (€)</label>
-                <input type="number" step="0.01" class="form-control" id="food_cost" name="food_cost" required min="0">
+
+            <!-- Chicken Form -->
+            <div class="tab-pane fade" id="chicken" role="tabpanel">
+                <form action="{{ url_for('add') }}" method="POST">
+                    <input type="hidden" name="type" value="chicken">
+                    <div class="mb-3">
+                        <label class="form-label">Datum</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Änderung Anzahl (+/-)</label>
+                        <input type="number" class="form-control" name="amount" required placeholder="+10 oder -1">
+                        <small class="text-muted">Positiv für Kauf, Negativ für Verlust/Verkauf</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kosten (€)</label>
+                        <input type="number" step="0.01" class="form-control" name="cost" value="0" min="0">
+                        <small class="text-muted">Kosten für Kauf (bei Verlust 0 lassen)</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Grund / Notiz</label>
+                        <input type="text" class="form-control" name="note" placeholder="z.B. Fuchs, Neukauf, Verkauf">
+                    </div>
+                    <button type="submit" class="btn btn-info text-white">Bestandsänderung eintragen</button>
+                </form>
             </div>
-            <button type="submit" class="btn btn-primary">Eintrag hinzufügen</button>
-        </form>
+        </div>
     </div>
+
     <div class="col-md-6">
         <h3>Neueste Einträge</h3>
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th>Datum</th>
-                    <th>Eier</th>
-                    <th>Kosten</th>
+                    <th>Typ</th>
+                    <th>Wert</th>
+                    <th>Notiz</th>
                 </tr>
             </thead>
             <tbody>
                 {% for record in records %}
                 <tr>
                     <td>{{ record.date }}</td>
-                    <td>{{ record.eggs }}</td>
-                    <td>{{ record.food_cost }} €</td>
+                    <td>
+                        {% if record.type == 'egg' %}
+                            <span class="badge bg-primary">Eier</span>
+                        {% elif record.type == 'food' %}
+                            <span class="badge bg-warning text-dark">Futter</span>
+                        {% elif record.type == 'chicken' %}
+                            <span class="badge bg-info text-dark">Hühner</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if record.type == 'egg' %}
+                            {{ record.amount }} Stk
+                        {% elif record.type == 'food' %}
+                            {{ record.cost }} €
+                        {% elif record.type == 'chicken' %}
+                            {{ record.amount }} ({{ record.cost }} €)
+                        {% endif %}
+                    </td>
+                    <td>{{ record.note }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

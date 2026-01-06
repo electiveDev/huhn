@@ -1,2 +1,5 @@
-id,date,eggs,food_cost
-de0a6aa7-fee9-488e-b5b6-52ec4ac991c1,2023-10-01,10,5.0
+id,date,type,amount,cost,note
+4263ad0e-4606-4bf1-b554-4e2510a23480,2023-01-01,chicken,10,100.0,
+b0b2c7c5-674f-48e9-9352-caa635f850ee,2023-01-02,food,0,50.0,
+ca595089-111d-45c9-a1e0-7cdc0ab81c3d,2023-01-03,egg,50,0.0,
+b564d292-17e4-486a-a3ae-eb57697c2372,2023-02-01,chicken,-1,0.0,
