@@ -9,8 +9,10 @@
                 <thead>
                     <tr>
                         <th>Datum</th>
-                        <th>Eier</th>
+                        <th>Typ</th>
+                        <th>Menge</th>
                         <th>Kosten</th>
+                        <th>Notiz</th>
                         <th>Aktionen</th>
                     </tr>
                 </thead>
@@ -18,8 +20,18 @@
                     {% for record in records %}
                     <tr>
                         <td>{{ record.date }}</td>
-                        <td>{{ record.eggs }}</td>
-                        <td>{{ record.food_cost }} €</td>
+                        <td>
+                             {% if record.type == 'egg' %}
+                                <span class="badge bg-primary">Eier</span>
+                            {% elif record.type == 'food' %}
+                                <span class="badge bg-warning text-dark">Futter</span>
+                            {% elif record.type == 'chicken' %}
+                                <span class="badge bg-info text-dark">Hühner</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ record.amount }}</td>
+                        <td>{{ record.cost }} €</td>
+                        <td>{{ record.note }}</td>
                         <td>
                             <a href="{{ url_for('edit', id=record.id) }}" class="btn btn-sm btn-warning">Bearbeiten</a>
                             <form action="{{ url_for('delete', id=record.id) }}" method="POST" style="display:inline;">

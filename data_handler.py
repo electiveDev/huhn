@@ -1,6 +1,7 @@
 import pandas as pd
 import uuid
 import os
+from datetime import datetime
 
 DATA_FILE = 'data/data.csv'
 
@@ -10,32 +11,51 @@ def _ensure_file_exists():
         os.makedirs(directory)
 
     if not os.path.exists(DATA_FILE):
-        df = pd.DataFrame(columns=['id', 'date', 'eggs', 'food_cost'])
+        df = pd.DataFrame(columns=['id', 'date', 'type', 'amount', 'cost', 'note'])
         df.to_csv(DATA_FILE, index=False)
 
 def get_all_records():
     _ensure_file_exists()
     try:
         df = pd.read_csv(DATA_FILE)
-        # Sort by date descending
+        if df.empty:
+            return []
+
         df['date'] = pd.to_datetime(df['date'])
         df = df.sort_values(by='date', ascending=False)
-        # Convert date back to string for display if needed or keep as object
-        df['date'] = df['date'].dt.strftime('%d/%m/%Y')
-        return df.to_dict('records')
+
+        # Display format
+        df['display_date'] = df['date'].dt.strftime('%d/%m/%Y')
+        # Keep raw date for editing
+        df['raw_date'] = df['date'].dt.strftime('%Y-%m-%d')
+
+        records = df.to_dict('records')
+        # Remap type to German for display
+        type_map = {'egg': 'Eier', 'food': 'Futter', 'chicken': 'Hühner'}
+
+        # Replace NaN with empty string
+        df = df.fillna('')
+        records = df.to_dict('records')
+
+        for r in records:
+            r['date'] = r['display_date']
+            r['type_display'] = type_map.get(r['type'], r['type'])
+
+        return records
     except pd.errors.EmptyDataError:
         return []
 
-def add_record(date, eggs, food_cost):
+def add_record(date, record_type, amount=0, cost=0.0, note=""):
     _ensure_file_exists()
     new_record = {
         'id': str(uuid.uuid4()),
         'date': date,
-        'eggs': int(eggs),
-        'food_cost': float(food_cost)
+        'type': record_type,
+        'amount': int(amount) if amount else 0,
+        'cost': float(cost) if cost else 0.0,
+        'note': str(note) if note else ""
     }
     df = pd.DataFrame([new_record])
-    # Append to CSV
     if os.path.exists(DATA_FILE) and os.path.getsize(DATA_FILE) > 0:
         df.to_csv(DATA_FILE, mode='a', header=False, index=False)
     else:
@@ -47,14 +67,16 @@ def get_record(record_id):
     df = pd.read_csv(DATA_FILE)
     record = df[df['id'] == record_id]
     if not record.empty:
+        # Replace NaN with empty string/None for form handling
+        record = record.fillna('')
         return record.iloc[0].to_dict()
     return None
 
-def update_record(record_id, date, eggs, food_cost):
+def update_record(record_id, date, amount, cost, note):
     _ensure_file_exists()
     df = pd.read_csv(DATA_FILE)
     if record_id in df['id'].values:
-        df.loc[df['id'] == record_id, ['date', 'eggs', 'food_cost']] = [date, int(eggs), float(food_cost)]
+        df.loc[df['id'] == record_id, ['date', 'amount', 'cost', 'note']] = [date, int(amount), float(cost), note]
         df.to_csv(DATA_FILE, index=False)
         return True
     return False
@@ -73,49 +95,89 @@ def get_statistics():
     try:
         df = pd.read_csv(DATA_FILE)
         if df.empty:
-            return {
-                'avg_eggs_day': 0,
-                'avg_eggs_month': 0,
-                'avg_eggs_year': 0,
-                'avg_cost_month': 0,
-                'total_eggs': 0,
-                'total_cost': 0
-            }
+            return _empty_stats()
 
         df['date'] = pd.to_datetime(df['date'])
 
-        # Overall Stats
-        total_eggs = df['eggs'].sum()
-        total_cost = df['food_cost'].sum()
-        days_recorded = df['date'].nunique()
+        # --- Filters ---
+        # Explicit copy to avoid SettingWithCopyWarning
+        eggs_df = df[df['type'] == 'egg'].copy()
+        food_df = df[df['type'] == 'food'].copy()
+        chicken_df = df[df['type'] == 'chicken'].copy()
+
+        # --- Chicken Stats ---
+        current_chickens = chicken_df['amount'].sum()
+
+        # --- Egg Stats ---
+        total_eggs = eggs_df['amount'].sum()
+        days_recorded = eggs_df['date'].nunique()
         avg_eggs_day = total_eggs / days_recorded if days_recorded > 0 else 0
 
-        # Monthly Stats
-        df['month'] = df['date'].dt.to_period('M')
-        monthly_stats = df.groupby('month').agg({'eggs': 'sum', 'food_cost': 'sum'})
-        avg_eggs_month = monthly_stats['eggs'].mean() if not monthly_stats.empty else 0
-        avg_cost_month = monthly_stats['food_cost'].mean() if not monthly_stats.empty else 0
+        if not eggs_df.empty:
+            eggs_df['month'] = eggs_df['date'].dt.to_period('M')
+            monthly_eggs_stats = eggs_df.groupby('month')['amount'].sum()
+            avg_eggs_month = monthly_eggs_stats.mean()
 
-        # Yearly Stats
-        df['year'] = df['date'].dt.to_period('Y')
-        yearly_stats = df.groupby('year').agg({'eggs': 'sum'})
-        avg_eggs_year = yearly_stats['eggs'].mean() if not yearly_stats.empty else 0
+            eggs_df['year'] = eggs_df['date'].dt.to_period('Y')
+            yearly_eggs_stats = eggs_df.groupby('year')['amount'].sum()
+            avg_eggs_year = yearly_eggs_stats.mean()
+        else:
+            avg_eggs_month = 0
+            avg_eggs_year = 0
+
+        # --- Food Stats ---
+        if not food_df.empty:
+            food_df['month'] = food_df['date'].dt.to_period('M')
+            monthly_food_cost = food_df.groupby('month')['cost'].sum()
+            avg_food_cost_month = monthly_food_cost.mean()
+
+            food_df['year'] = food_df['date'].dt.to_period('Y')
+            yearly_food_cost_sum = food_df.groupby('year')['cost'].sum()
+        else:
+            avg_food_cost_month = 0
+        # Just getting the sum for the current year would be better, but "Statistik übers ganze Jahr"
+        # usually implies total cost per year. Let's provide the average yearly cost or just total?
+        # User said: "monatskosten und kosten pro jahr" -> Monthly Costs and Costs per Year.
+        # Let's provide Avg Monthly Cost and Total Cost Last Year (or avg yearly).
+        # For simplicity in the dashboard, let's show Avg Monthly.
+
+        total_food_cost = food_df['cost'].sum()
+
+        # --- Cost per Egg Logic ---
+        # Cost per Egg = (Total Food Cost + Total Chicken Cost) / Total Eggs
+        # Note: This is an overall average "production cost".
+        total_chicken_cost = chicken_df['cost'].sum() # Cost to buy chickens
+
+        # Net cost? If selling chickens returns money (negative cost?), we sum it.
+        # Assuming 'cost' column is positive for expense.
+
+        overall_cost = total_food_cost + total_chicken_cost
+        cost_per_egg = overall_cost / total_eggs if total_eggs > 0 else 0
 
         return {
             'avg_eggs_day': round(avg_eggs_day, 2),
             'avg_eggs_month': round(avg_eggs_month, 2),
             'avg_eggs_year': round(avg_eggs_year, 2),
-            'avg_cost_month': round(avg_cost_month, 2),
+            'avg_food_cost_month': round(avg_food_cost_month, 2),
+            'current_chickens': int(current_chickens),
+            'cost_per_egg': round(cost_per_egg, 2),
             'total_eggs': int(total_eggs),
-            'total_cost': round(total_cost, 2)
+            'total_food_cost': round(total_food_cost, 2),
+            'total_chicken_cost': round(total_chicken_cost, 2)
         }
     except Exception as e:
         print(f"Error calculating stats: {e}")
-        return {
-            'avg_eggs_day': 0,
-            'avg_eggs_month': 0,
-            'avg_eggs_year': 0,
-            'avg_cost_month': 0,
-            'total_eggs': 0,
-            'total_cost': 0
-        }
+        return _empty_stats()
+
+def _empty_stats():
+    return {
+        'avg_eggs_day': 0,
+        'avg_eggs_month': 0,
+        'avg_eggs_year': 0,
+        'avg_food_cost_month': 0,
+        'current_chickens': 0,
+        'cost_per_egg': 0,
+        'total_eggs': 0,
+        'total_food_cost': 0,
+        'total_chicken_cost': 0
+    }

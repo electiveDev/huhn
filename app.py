@@ -7,18 +7,32 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     stats = get_statistics()
-    # Also get recent 5 records for the dashboard
-    records = get_all_records()[:5]
+    # Get recent records
+    records = get_all_records()[:10]
     return render_template('index.html', stats=stats, records=records)
 
 @app.route('/add', methods=['POST'])
 def add():
+    record_type = request.form.get('type')
     date = request.form.get('date')
-    eggs = request.form.get('eggs')
-    food_cost = request.form.get('food_cost')
 
-    if date and eggs and food_cost:
-        add_record(date, eggs, food_cost)
+    amount = 0
+    cost = 0.0
+    note = request.form.get('note', '')
+
+    if record_type == 'egg':
+        amount = request.form.get('amount')
+    elif record_type == 'food':
+        cost = request.form.get('cost')
+        # Amount could be used for weight, but user wants cost mostly.
+        # We can store weight in note or separate field if needed.
+        # For now, simplistic approach from plan.
+    elif record_type == 'chicken':
+        amount = request.form.get('amount')
+        cost = request.form.get('cost')
+
+    if date and record_type:
+        add_record(date, record_type, amount, cost, note)
 
     return redirect(url_for('index'))
 
@@ -37,11 +51,13 @@ def edit(id):
 @app.route('/update/<id>', methods=['POST'])
 def update(id):
     date = request.form.get('date')
-    eggs = request.form.get('eggs')
-    food_cost = request.form.get('food_cost')
+    amount = request.form.get('amount')
+    cost = request.form.get('cost')
+    note = request.form.get('note')
 
-    if date and eggs and food_cost:
-        update_record(id, date, eggs, food_cost)
+    # We don't update type usually, but we could. For now assume type is fixed.
+    if date:
+        update_record(id, date, amount, cost, note)
 
     return redirect(url_for('records'))
 
