@@ -141,6 +141,9 @@ def get_statistics():
             avg_eggs_year = 0
 
         # --- Food Stats ---
+        avg_food_cost_year = 0
+        food_cost_current_year = 0
+
         if not food_df.empty:
             food_df['month'] = food_df['date'].dt.to_period('M')
             monthly_food_cost = food_df.groupby('month')['cost'].sum()
@@ -148,13 +151,13 @@ def get_statistics():
 
             food_df['year'] = food_df['date'].dt.to_period('Y')
             yearly_food_cost_sum = food_df.groupby('year')['cost'].sum()
+            avg_food_cost_year = yearly_food_cost_sum.mean()
+
+            current_year_period = pd.Period.now('Y')
+            if current_year_period in yearly_food_cost_sum.index:
+                food_cost_current_year = yearly_food_cost_sum.loc[current_year_period]
         else:
             avg_food_cost_month = 0
-        # Just getting the sum for the current year would be better, but "Statistik übers ganze Jahr"
-        # usually implies total cost per year. Let's provide the average yearly cost or just total?
-        # User said: "monatskosten und kosten pro jahr" -> Monthly Costs and Costs per Year.
-        # Let's provide Avg Monthly Cost and Total Cost Last Year (or avg yearly).
-        # For simplicity in the dashboard, let's show Avg Monthly.
 
         total_food_cost = food_df['cost'].sum()
 
@@ -174,6 +177,8 @@ def get_statistics():
             'avg_eggs_month': round(avg_eggs_month, 2),
             'avg_eggs_year': round(avg_eggs_year, 2),
             'avg_food_cost_month': round(avg_food_cost_month, 2),
+            'avg_food_cost_year': round(avg_food_cost_year, 2),
+            'food_cost_current_year': round(food_cost_current_year, 2),
             'current_chickens': int(current_chickens),
             'cost_per_egg': round(cost_per_egg, 2),
             'total_eggs': int(total_eggs),
@@ -190,6 +195,8 @@ def _empty_stats():
         'avg_eggs_month': 0,
         'avg_eggs_year': 0,
         'avg_food_cost_month': 0,
+        'avg_food_cost_year': 0,
+        'food_cost_current_year': 0,
         'current_chickens': 0,
         'cost_per_egg': 0,
         'total_eggs': 0,
