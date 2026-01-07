@@ -49,7 +49,12 @@ def edit(id):
 @app.route('/update/<id>', methods=['POST'])
 def update(id):
     date = request.form.get('date')
-    record_type = get_record(id).get('type')
+    # Get type from form, defaulting to existing type if somehow missing
+    existing_record = get_record(id)
+    if not existing_record:
+        return redirect(url_for('records'))
+
+    record_type = request.form.get('type', existing_record.get('type'))
 
     amount = request.form.get('amount', 0)
     cost = request.form.get('cost', 0.0)
@@ -65,7 +70,7 @@ def update(id):
         # For chicken, both are applicable
         pass
 
-    update_record(id, date, amount, cost, note)
+    update_record(id, date, amount, cost, note, record_type)
     return redirect(url_for('records'))
 
 @app.route('/delete/<id>', methods=['POST'])

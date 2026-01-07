@@ -79,19 +79,26 @@ def get_record(record_id):
         return record.iloc[0].to_dict()
     return None
 
-def update_record(record_id, date, amount, cost, note):
+def update_record(record_id, date, amount, cost, note, record_type=None):
     _ensure_file_exists()
     df = pd.read_csv(DATA_FILE)
     if record_id in df['id'].values:
-        record_type = df.loc[df['id'] == record_id, 'type'].iloc[0]
+        current_type = df.loc[df['id'] == record_id, 'type'].iloc[0]
+
+        # If new type is provided, use it; otherwise keep current
+        new_type = record_type if record_type else current_type
 
         amount_val = 0
-        if record_type == 'food':
+        if new_type == 'food':
             amount_val = float(amount) if amount else 0.0
         else:
-            amount_val = int(amount) if amount else 0
+            # Handle float strings like "10.5" by casting to float first
+            amount_val = int(float(amount)) if amount else 0
 
-        df.loc[df['id'] == record_id, ['date', 'amount', 'cost', 'note']] = [date, amount_val, float(cost), note]
+        # For eggs, cost should be 0.0
+        cost_val = 0.0 if new_type == 'egg' else (float(cost) if cost else 0.0)
+
+        df.loc[df['id'] == record_id, ['date', 'type', 'amount', 'cost', 'note']] = [date, new_type, amount_val, cost_val, note]
         df.to_csv(DATA_FILE, index=False)
         return True
     return False

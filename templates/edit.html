@@ -4,61 +4,71 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <h2>Eintrag bearbeiten</h2>
-        <div class="alert alert-info">
-            Typ:
-            {% if record.type == 'egg' %} Eier
-            {% elif record.type == 'food' %} Futter
-            {% elif record.type == 'chicken' %} Hühner
-            {% endif %}
-        </div>
 
         <form action="{{ url_for('update', id=record.id) }}" method="POST">
+            <div class="mb-3">
+                <label for="type" class="form-label">Typ</label>
+                <select class="form-select" id="type" name="type" onchange="updateForm()">
+                    <option value="egg" {% if record.type == 'egg' %}selected{% endif %}>Eier</option>
+                    <option value="food" {% if record.type == 'food' %}selected{% endif %}>Futter</option>
+                    <option value="chicken" {% if record.type == 'chicken' %}selected{% endif %}>Hühner</option>
+                </select>
+            </div>
+
             <div class="mb-3">
                 <label for="date" class="form-label">Datum</label>
                 <!-- Use raw_date for input value -->
                 <input type="date" class="form-control" id="date" name="date" value="{{ record.date }}" required>
             </div>
 
-            {% if record.type == 'egg' %}
             <div class="mb-3">
-                <label class="form-label">Anzahl Eier</label>
-                <input type="number" class="form-control" name="amount" value="{{ record.amount }}" required min="0">
+                <label class="form-label" id="amount-label">Menge</label>
+                <input type="number" step="any" class="form-control" name="amount" value="{{ record.amount }}" required>
+                <small class="text-muted" id="amount-help"></small>
             </div>
-            {% endif %}
 
-            {% if record.type == 'food' %}
-            <div class="mb-3">
-                <label class="form-label">Gewicht (kg)</label>
-                <input type="number" step="0.01" class="form-control" name="amount" value="{{ record.amount }}" required min="0">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Kosten (€)</label>
-                <input type="number" step="0.01" class="form-control" name="cost" value="{{ record.cost }}" required min="0">
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Notiz</label>
-                <input type="text" class="form-control" name="note" value="{{ record.note }}">
-            </div>
-            {% endif %}
-
-            {% if record.type == 'chicken' %}
-            <div class="mb-3">
-                <label class="form-label">Änderung Anzahl (+/-)</label>
-                <input type="number" class="form-control" name="amount" value="{{ record.amount }}" required>
-            </div>
-            <div class="mb-3">
+            <div class="mb-3" id="cost-group">
                 <label class="form-label">Kosten (€)</label>
                 <input type="number" step="0.01" class="form-control" name="cost" value="{{ record.cost }}" min="0">
             </div>
+
             <div class="mb-3">
-                <label class="form-label">Grund / Notiz</label>
+                <label class="form-label" id="note-label">Notiz</label>
                 <input type="text" class="form-control" name="note" value="{{ record.note }}">
             </div>
-            {% endif %}
 
             <button type="submit" class="btn btn-primary">Aktualisieren</button>
             <a href="{{ url_for('records') }}" class="btn btn-secondary">Abbrechen</a>
         </form>
+
+        <script>
+            function updateForm() {
+                const type = document.getElementById('type').value;
+                const amountLabel = document.getElementById('amount-label');
+                const amountHelp = document.getElementById('amount-help');
+                const costGroup = document.getElementById('cost-group');
+                const noteLabel = document.getElementById('note-label');
+
+                if (type === 'egg') {
+                    amountLabel.innerText = 'Anzahl Eier';
+                    amountHelp.innerText = '';
+                    costGroup.style.display = 'none';
+                    noteLabel.innerText = 'Notiz';
+                } else if (type === 'food') {
+                    amountLabel.innerText = 'Gewicht (kg)';
+                    amountHelp.innerText = '';
+                    costGroup.style.display = 'block';
+                    noteLabel.innerText = 'Notiz (z.B. Marke)';
+                } else if (type === 'chicken') {
+                    amountLabel.innerText = 'Änderung Anzahl (+/-)';
+                    amountHelp.innerText = 'Positiv für Kauf, Negativ für Verlust/Verkauf';
+                    costGroup.style.display = 'block';
+                    noteLabel.innerText = 'Grund / Notiz';
+                }
+            }
+            // Initialize on load
+            updateForm();
+        </script>
     </div>
 </div>
 {% endblock %}
