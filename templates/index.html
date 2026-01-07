@@ -53,7 +53,9 @@
          <div class="card mb-3">
             <div class="card-header">Jahresstatistik (Futter)</div>
             <div class="card-body">
-                <p>Gesamtkosten Futter: {{ stats.total_food_cost }} €</p>
+                <p>Kosten dieses Jahr: {{ stats.food_cost_current_year }} €</p>
+                <p>Ø Kosten pro Jahr: {{ stats.avg_food_cost_year }} €</p>
+                <p><small class="text-muted">Gesamtkosten (Alle Jahre): {{ stats.total_food_cost }} €</small></p>
             </div>
         </div>
     </div>
