@@ -110,12 +110,16 @@
                         <input type="date" class="form-control" name="date" required>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Gewicht (kg)</label>
+                        <input type="number" step="0.01" class="form-control" name="amount" required min="0">
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Kosten (€)</label>
                         <input type="number" step="0.01" class="form-control" name="cost" required min="0">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Notiz (z.B. Menge/Marke)</label>
-                        <input type="text" class="form-control" name="note" placeholder="z.B. 25kg Sack">
+                        <label class="form-label">Notiz (z.B. Marke)</label>
+                        <input type="text" class="form-control" name="note" placeholder="z.B. Deuka">
                     </div>
                     <button type="submit" class="btn btn-warning">Futterkauf eintragen</button>
                 </form>
@@ -177,7 +181,7 @@
                         {% if record.type == 'egg' %}
                             {{ record.amount }} Stk
                         {% elif record.type == 'food' %}
-                            {{ record.cost }} €
+                            {{ record.amount }} kg ({{ record.cost }} €)
                         {% elif record.type == 'chicken' %}
                             {{ record.amount }} ({{ record.cost }} €)
                         {% endif %}
