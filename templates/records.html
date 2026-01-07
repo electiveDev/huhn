@@ -29,8 +29,14 @@
                                 <span class="badge bg-info text-dark">Hühner</span>
                             {% endif %}
                         </td>
-                        <td>{{ record.amount }}</td>
-                        <td>{{ record.cost }} €</td>
+                        <td>
+                            {% if record.type == 'food' %}
+                                {{ "%.2f"|format(record.amount|float) }} kg
+                            {% else %}
+                                {{ record.amount }}
+                            {% endif %}
+                        </td>
+                        <td>{{ "%.2f"|format(record.cost|float) }} €</td>
                         <td>{{ record.note }}</td>
                         <td>
                             <a href="{{ url_for('edit', id=record.id) }}" class="btn btn-sm btn-warning">Bearbeiten</a>

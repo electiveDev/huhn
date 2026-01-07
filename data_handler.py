@@ -47,11 +47,18 @@ def get_all_records():
 
 def add_record(date, record_type, amount=0, cost=0.0, note=""):
     _ensure_file_exists()
+
+    amount_val = 0
+    if record_type == 'food':
+        amount_val = float(amount) if amount else 0.0
+    else:
+        amount_val = int(amount) if amount else 0
+
     new_record = {
         'id': str(uuid.uuid4()),
         'date': date,
         'type': record_type,
-        'amount': int(amount) if amount else 0,
+        'amount': amount_val,
         'cost': float(cost) if cost else 0.0,
         'note': str(note) if note else ""
     }
@@ -76,7 +83,15 @@ def update_record(record_id, date, amount, cost, note):
     _ensure_file_exists()
     df = pd.read_csv(DATA_FILE)
     if record_id in df['id'].values:
-        df.loc[df['id'] == record_id, ['date', 'amount', 'cost', 'note']] = [date, int(amount), float(cost), note]
+        record_type = df.loc[df['id'] == record_id, 'type'].iloc[0]
+
+        amount_val = 0
+        if record_type == 'food':
+            amount_val = float(amount) if amount else 0.0
+        else:
+            amount_val = int(amount) if amount else 0
+
+        df.loc[df['id'] == record_id, ['date', 'amount', 'cost', 'note']] = [date, amount_val, float(cost), note]
         df.to_csv(DATA_FILE, index=False)
         return True
     return False

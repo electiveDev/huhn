@@ -23,10 +23,8 @@ def add():
     if record_type == 'egg':
         amount = request.form.get('amount')
     elif record_type == 'food':
+        amount = request.form.get('amount')
         cost = request.form.get('cost')
-        # Amount could be used for weight, but user wants cost mostly.
-        # We can store weight in note or separate field if needed.
-        # For now, simplistic approach from plan.
     elif record_type == 'chicken':
         amount = request.form.get('amount')
         cost = request.form.get('cost')
@@ -51,14 +49,23 @@ def edit(id):
 @app.route('/update/<id>', methods=['POST'])
 def update(id):
     date = request.form.get('date')
-    amount = request.form.get('amount')
-    cost = request.form.get('cost')
-    note = request.form.get('note')
+    record_type = get_record(id).get('type')
 
-    # We don't update type usually, but we could. For now assume type is fixed.
-    if date:
-        update_record(id, date, amount, cost, note)
+    amount = request.form.get('amount', 0)
+    cost = request.form.get('cost', 0.0)
+    note = request.form.get('note', '')
 
+    if record_type == 'food':
+        # For food, amount is weight
+        pass
+    elif record_type == 'egg':
+        # For eggs, cost is not applicable
+        cost = 0.0
+    elif record_type == 'chicken':
+        # For chicken, both are applicable
+        pass
+
+    update_record(id, date, amount, cost, note)
     return redirect(url_for('records'))
 
 @app.route('/delete/<id>', methods=['POST'])
