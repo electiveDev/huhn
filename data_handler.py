@@ -154,10 +154,35 @@ def get_statistics():
         if not food_df.empty:
             food_df['month'] = food_df['date'].dt.to_period('M')
             monthly_food_cost = food_df.groupby('month')['cost'].sum()
+
+            # Fill missing months from start to current
+            start_month = monthly_food_cost.index.min()
+            current_month = pd.Period.now('M')
+            end_month = max(start_month, current_month) # Ensure end is not before start
+
+            # If records go beyond current date, extend to that
+            if not monthly_food_cost.empty:
+                end_month = max(end_month, monthly_food_cost.index.max())
+
+            full_range = pd.period_range(start=start_month, end=end_month, freq='M')
+            monthly_food_cost = monthly_food_cost.reindex(full_range, fill_value=0)
+
             avg_food_cost_month = monthly_food_cost.mean()
 
             food_df['year'] = food_df['date'].dt.to_period('Y')
             yearly_food_cost_sum = food_df.groupby('year')['cost'].sum()
+
+            # Fill missing years from start to current
+            start_year = yearly_food_cost_sum.index.min()
+            current_year = pd.Period.now('Y')
+            end_year = max(start_year, current_year)
+
+            if not yearly_food_cost_sum.empty:
+                end_year = max(end_year, yearly_food_cost_sum.index.max())
+
+            full_year_range = pd.period_range(start=start_year, end=end_year, freq='Y')
+            yearly_food_cost_sum = yearly_food_cost_sum.reindex(full_year_range, fill_value=0)
+
             avg_food_cost_year = yearly_food_cost_sum.mean()
 
             current_year_period = pd.Period.now('Y')

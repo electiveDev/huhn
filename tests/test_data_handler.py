@@ -51,5 +51,28 @@ class TestDataHandler(unittest.TestCase):
         stats = get_statistics()
         self.assertEqual(stats['current_chickens'], 9)
 
+    def test_statistics_time_range_logic(self):
+        from unittest.mock import patch
+
+        # Scenario: Food bought in Nov 2023. Current date Jan 2024.
+        add_record('2023-11-15', 'food', amount=10, cost=90.00)
+
+        with patch('pandas.Period.now') as mock_now:
+            def side_effect(freq):
+                if freq == 'M':
+                    return pd.Period('2024-01', freq='M')
+                if freq == 'Y':
+                    return pd.Period('2024', freq='Y')
+                return pd.Period.now(freq)
+
+            mock_now.side_effect = side_effect
+
+            stats = get_statistics()
+            # Nov 2023, Dec 2023, Jan 2024 = 3 months. 90/3 = 30.
+            self.assertEqual(stats['avg_food_cost_month'], 30.0)
+
+            # Years: 2023, 2024 = 2 years. 90/2 = 45.
+            self.assertEqual(stats['avg_food_cost_year'], 45.0)
+
 if __name__ == '__main__':
     unittest.main()
