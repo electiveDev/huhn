@@ -5,6 +5,9 @@ from datetime import datetime
 
 DATA_FILE = 'data/data.csv'
 
+_CACHED_DF = None
+_LAST_MTIME = 0
+
 def _ensure_file_exists():
     directory = os.path.dirname(DATA_FILE)
     if not os.path.exists(directory):
@@ -14,14 +17,36 @@ def _ensure_file_exists():
         df = pd.DataFrame(columns=['id', 'date', 'type', 'amount', 'cost', 'note'])
         df.to_csv(DATA_FILE, index=False)
 
-def get_all_records():
+def _get_data():
+    """
+    Reads the data from the CSV file.
+    Implements a caching mechanism to avoid re-reading and re-parsing the file
+    if it hasn't changed since the last read.
+    Returns a copy of the dataframe to prevent external modification of the cache.
+    """
+    global _CACHED_DF, _LAST_MTIME
     _ensure_file_exists()
     try:
+        current_mtime = os.path.getmtime(DATA_FILE)
+        if _CACHED_DF is not None and current_mtime == _LAST_MTIME:
+            return _CACHED_DF.copy()
+
         df = pd.read_csv(DATA_FILE)
+        if not df.empty:
+            df['date'] = pd.to_datetime(df['date'])
+
+        _CACHED_DF = df
+        _LAST_MTIME = current_mtime
+        return df.copy()
+    except (pd.errors.EmptyDataError, FileNotFoundError):
+        return pd.DataFrame(columns=['id', 'date', 'type', 'amount', 'cost', 'note'])
+
+def get_all_records():
+    try:
+        df = _get_data()
         if df.empty:
             return []
 
-        df['date'] = pd.to_datetime(df['date'])
         df = df.sort_values(by='date', ascending=False)
 
         # Display format
@@ -113,13 +138,10 @@ def delete_record(record_id):
     return False
 
 def get_statistics():
-    _ensure_file_exists()
     try:
-        df = pd.read_csv(DATA_FILE)
+        df = _get_data()
         if df.empty:
             return _empty_stats()
-
-        df['date'] = pd.to_datetime(df['date'])
 
         # --- Filters ---
         # Explicit copy to avoid SettingWithCopyWarning
