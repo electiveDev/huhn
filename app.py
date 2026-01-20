@@ -1,8 +1,30 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from data_handler import get_statistics, add_record, get_all_records, get_record, update_record, delete_record
 import os
+from translations import TRANSLATIONS
 
 app = Flask(__name__)
+# Set a secret key for session management
+app.secret_key = 'dev_key_123'  # Change this to a secure random string in production
+
+@app.before_request
+def before_request():
+    if 'language' not in session:
+        session['language'] = 'de'
+
+@app.context_processor
+def inject_language():
+    def t(key):
+        lang = session.get('language', 'de')
+        return TRANSLATIONS.get(lang, {}).get(key, key)
+
+    return dict(language=session.get('language', 'de'), t=t)
+
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    if lang in TRANSLATIONS:
+        session['language'] = lang
+    return redirect(request.referrer or url_for('index'))
 
 @app.route('/')
 def index():

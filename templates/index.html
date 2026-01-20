@@ -3,7 +3,7 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-md-12">
-        <h1>Übersicht</h1>
+        <h1>{{ t('overview_title') }}</h1>
     </div>
 </div>
 
@@ -12,16 +12,16 @@
     <!-- Chicken Stats -->
     <div class="col-md-3">
         <div class="card text-white bg-info mb-3">
-            <div class="card-header">Aktueller Bestand</div>
+            <div class="card-header">{{ t('card_current_stock') }}</div>
             <div class="card-body">
-                <h5 class="card-title">{{ stats.current_chickens }} Hühner</h5>
+                <h5 class="card-title">{{ stats.current_chickens }} {{ t('unit_chickens') }}</h5>
             </div>
         </div>
     </div>
     <!-- Egg Stats -->
     <div class="col-md-3">
         <div class="card text-white bg-primary mb-3">
-            <div class="card-header">Ø Eier / Tag</div>
+            <div class="card-header">{{ t('card_avg_eggs_day') }}</div>
             <div class="card-body">
                 <h5 class="card-title">{{ stats.avg_eggs_day }}</h5>
             </div>
@@ -30,17 +30,17 @@
     <!-- Cost Efficiency -->
     <div class="col-md-3">
         <div class="card text-white bg-success mb-3">
-            <div class="card-header">Kosten / Ei</div>
+            <div class="card-header">{{ t('card_cost_egg') }}</div>
             <div class="card-body">
                 <h5 class="card-title">{{ stats.cost_per_egg }} €</h5>
-                <small class="text-white">Prod. Kosten</small>
+                <small class="text-white">{{ t('text_prod_costs') }}</small>
             </div>
         </div>
     </div>
      <!-- Monthly Food Cost -->
     <div class="col-md-3">
         <div class="card text-white bg-warning mb-3">
-            <div class="card-header">Ø Futter / Monat</div>
+            <div class="card-header">{{ t('card_avg_food_month') }}</div>
             <div class="card-body">
                 <h5 class="card-title">{{ stats.avg_food_cost_month }} €</h5>
             </div>
@@ -51,20 +51,20 @@
 <div class="row mb-4">
     <div class="col-md-6">
          <div class="card mb-3">
-            <div class="card-header">Jahresstatistik (Futter)</div>
+            <div class="card-header">{{ t('card_year_stats_food') }}</div>
             <div class="card-body">
-                <p>Kosten dieses Jahr: {{ stats.food_cost_current_year }} €</p>
-                <p>Ø Kosten pro Jahr: {{ stats.avg_food_cost_year }} €</p>
-                <p><small class="text-muted">Gesamtkosten (Alle Jahre): {{ stats.total_food_cost }} €</small></p>
+                <p>{{ t('text_cost_this_year') }}: {{ stats.food_cost_current_year }} €</p>
+                <p>{{ t('text_avg_cost_year') }}: {{ stats.avg_food_cost_year }} €</p>
+                <p><small class="text-muted">{{ t('text_total_food_cost') }}: {{ stats.total_food_cost }} €</small></p>
             </div>
         </div>
     </div>
     <div class="col-md-6">
         <div class="card mb-3">
-            <div class="card-header">Jahresstatistik (Hühner)</div>
+            <div class="card-header">{{ t('card_year_stats_chicken') }}</div>
             <div class="card-body">
-                <p>Gesamtkosten Hühner: {{ stats.total_chicken_cost }} €</p>
-                <p>Gesamt Eier: {{ stats.total_eggs }}</p>
+                <p>{{ t('text_total_chicken_cost') }}: {{ stats.total_chicken_cost }} €</p>
+                <p>{{ t('text_total_eggs') }}: {{ stats.total_eggs }}</p>
             </div>
         </div>
     </div>
@@ -72,17 +72,17 @@
 
 <div class="row">
     <div class="col-md-6">
-        <h3>Eintrag hinzufügen</h3>
+        <h3>{{ t('title_add_record') }}</h3>
 
         <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="eggs-tab" data-bs-toggle="tab" data-bs-target="#eggs" type="button" role="tab">Eier</button>
+                <button class="nav-link active" id="eggs-tab" data-bs-toggle="tab" data-bs-target="#eggs" type="button" role="tab">{{ t('tab_eggs') }}</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="food-tab" data-bs-toggle="tab" data-bs-target="#food" type="button" role="tab">Futter</button>
+                <button class="nav-link" id="food-tab" data-bs-toggle="tab" data-bs-target="#food" type="button" role="tab">{{ t('tab_food') }}</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="chicken-tab" data-bs-toggle="tab" data-bs-target="#chicken" type="button" role="tab">Hühner</button>
+                <button class="nav-link" id="chicken-tab" data-bs-toggle="tab" data-bs-target="#chicken" type="button" role="tab">{{ t('tab_chickens') }}</button>
             </li>
         </ul>
 
@@ -92,14 +92,14 @@
                 <form action="{{ url_for('add') }}" method="POST">
                     <input type="hidden" name="type" value="egg">
                     <div class="mb-3">
-                        <label class="form-label">Datum</label>
+                        <label class="form-label">{{ t('label_date') }}</label>
                         <input type="date" class="form-control" name="date" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Anzahl Eier</label>
+                        <label class="form-label">{{ t('label_num_eggs') }}</label>
                         <input type="number" class="form-control" name="amount" required min="0">
                     </div>
-                    <button type="submit" class="btn btn-primary">Eier eintragen</button>
+                    <button type="submit" class="btn btn-primary">{{ t('btn_add_eggs') }}</button>
                 </form>
             </div>
 
@@ -108,22 +108,22 @@
                 <form action="{{ url_for('add') }}" method="POST">
                     <input type="hidden" name="type" value="food">
                     <div class="mb-3">
-                        <label class="form-label">Datum</label>
+                        <label class="form-label">{{ t('label_date') }}</label>
                         <input type="date" class="form-control" name="date" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Gewicht (kg)</label>
+                        <label class="form-label">{{ t('label_weight') }}</label>
                         <input type="number" step="0.01" class="form-control" name="amount" required min="0">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Kosten (€)</label>
+                        <label class="form-label">{{ t('label_cost') }}</label>
                         <input type="number" step="0.01" class="form-control" name="cost" required min="0">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Notiz (z.B. Marke)</label>
+                        <label class="form-label">{{ t('label_note_brand') }}</label>
                         <input type="text" class="form-control" name="note" placeholder="z.B. Deuka">
                     </div>
-                    <button type="submit" class="btn btn-warning">Futterkauf eintragen</button>
+                    <button type="submit" class="btn btn-warning">{{ t('btn_add_food') }}</button>
                 </form>
             </div>
 
@@ -132,38 +132,38 @@
                 <form action="{{ url_for('add') }}" method="POST">
                     <input type="hidden" name="type" value="chicken">
                     <div class="mb-3">
-                        <label class="form-label">Datum</label>
+                        <label class="form-label">{{ t('label_date') }}</label>
                         <input type="date" class="form-control" name="date" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Änderung Anzahl (+/-)</label>
+                        <label class="form-label">{{ t('label_change_amount') }}</label>
                         <input type="number" class="form-control" name="amount" required placeholder="+10 oder -1">
-                        <small class="text-muted">Positiv für Kauf, Negativ für Verlust/Verkauf</small>
+                        <small class="text-muted">{{ t('help_change_amount') }}</small>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Kosten (€)</label>
+                        <label class="form-label">{{ t('label_cost') }}</label>
                         <input type="number" step="0.01" class="form-control" name="cost" value="0" min="0">
-                        <small class="text-muted">Kosten für Kauf (bei Verlust 0 lassen)</small>
+                        <small class="text-muted">{{ t('help_cost_purchase') }}</small>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Grund / Notiz</label>
+                        <label class="form-label">{{ t('label_reason_note') }}</label>
                         <input type="text" class="form-control" name="note" placeholder="z.B. Fuchs, Neukauf, Verkauf">
                     </div>
-                    <button type="submit" class="btn btn-info text-white">Bestandsänderung eintragen</button>
+                    <button type="submit" class="btn btn-info text-white">{{ t('btn_add_stock_change') }}</button>
                 </form>
             </div>
         </div>
     </div>
 
     <div class="col-md-6">
-        <h3>Neueste Einträge</h3>
+        <h3>{{ t('title_latest_records') }}</h3>
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Datum</th>
-                    <th>Typ</th>
-                    <th>Wert</th>
-                    <th>Notiz</th>
+                    <th>{{ t('th_date') }}</th>
+                    <th>{{ t('th_type') }}</th>
+                    <th>{{ t('th_value') }}</th>
+                    <th>{{ t('th_note') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -172,16 +172,16 @@
                     <td>{{ record.date }}</td>
                     <td>
                         {% if record.type == 'egg' %}
-                            <span class="badge bg-primary">Eier</span>
+                            <span class="badge bg-primary">{{ t('badge_eggs') }}</span>
                         {% elif record.type == 'food' %}
-                            <span class="badge bg-warning text-dark">Futter</span>
+                            <span class="badge bg-warning text-dark">{{ t('badge_food') }}</span>
                         {% elif record.type == 'chicken' %}
-                            <span class="badge bg-info text-dark">Hühner</span>
+                            <span class="badge bg-info text-dark">{{ t('badge_chickens') }}</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if record.type == 'egg' %}
-                            {{ record.amount }} Stk
+                            {{ record.amount }} {{ t('unit_pcs') }}
                         {% elif record.type == 'food' %}
                             {{ record.amount }} kg ({{ record.cost }} €)
                         {% elif record.type == 'chicken' %}
@@ -193,7 +193,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{{ url_for('records') }}" class="btn btn-secondary">Alle Einträge ansehen</a>
+        <a href="{{ url_for('records') }}" class="btn btn-secondary">{{ t('btn_view_all') }}</a>
     </div>
 </div>
 

@@ -3,45 +3,56 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <h2>Eintrag bearbeiten</h2>
+        <h2>{{ t('title_edit_record') }}</h2>
 
         <form action="{{ url_for('update', id=record.id) }}" method="POST">
             <div class="mb-3">
-                <label for="type" class="form-label">Typ</label>
+                <label for="type" class="form-label">{{ t('label_type') }}</label>
                 <select class="form-select" id="type" name="type" onchange="updateForm()">
-                    <option value="egg" {% if record.type == 'egg' %}selected{% endif %}>Eier</option>
-                    <option value="food" {% if record.type == 'food' %}selected{% endif %}>Futter</option>
-                    <option value="chicken" {% if record.type == 'chicken' %}selected{% endif %}>Hühner</option>
+                    <option value="egg" {% if record.type == 'egg' %}selected{% endif %}>{{ t('badge_eggs') }}</option>
+                    <option value="food" {% if record.type == 'food' %}selected{% endif %}>{{ t('badge_food') }}</option>
+                    <option value="chicken" {% if record.type == 'chicken' %}selected{% endif %}>{{ t('badge_chickens') }}</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label for="date" class="form-label">Datum</label>
+                <label for="date" class="form-label">{{ t('label_date') }}</label>
                 <!-- Use raw_date for input value -->
                 <input type="date" class="form-control" id="date" name="date" value="{{ record.date }}" required>
             </div>
 
             <div class="mb-3">
-                <label class="form-label" id="amount-label">Menge</label>
+                <label class="form-label" id="amount-label">{{ t('th_amount') }}</label>
                 <input type="number" step="any" class="form-control" name="amount" value="{{ record.amount }}" required>
                 <small class="text-muted" id="amount-help"></small>
             </div>
 
             <div class="mb-3" id="cost-group">
-                <label class="form-label">Kosten (€)</label>
+                <label class="form-label">{{ t('label_cost') }}</label>
                 <input type="number" step="0.01" class="form-control" name="cost" value="{{ record.cost }}" min="0">
             </div>
 
             <div class="mb-3">
-                <label class="form-label" id="note-label">Notiz</label>
+                <label class="form-label" id="note-label">{{ t('th_note') }}</label>
                 <input type="text" class="form-control" name="note" value="{{ record.note }}">
             </div>
 
-            <button type="submit" class="btn btn-primary">Aktualisieren</button>
-            <a href="{{ url_for('records') }}" class="btn btn-secondary">Abbrechen</a>
+            <button type="submit" class="btn btn-primary">{{ t('btn_update') }}</button>
+            <a href="{{ url_for('records') }}" class="btn btn-secondary">{{ t('btn_cancel') }}</a>
         </form>
 
         <script>
+            // Define translations for JS
+            const trans = {
+                num_eggs: "{{ t('js_num_eggs') }}",
+                weight: "{{ t('js_weight') }}",
+                change_amount: "{{ t('js_change_amount') }}",
+                help_change: "{{ t('js_help_change') }}",
+                reason_note: "{{ t('js_reason_note') }}",
+                note: "{{ t('js_note') }}",
+                note_brand: "{{ t('js_note_brand') }}"
+            };
+
             function updateForm() {
                 const type = document.getElementById('type').value;
                 const amountLabel = document.getElementById('amount-label');
@@ -50,20 +61,20 @@
                 const noteLabel = document.getElementById('note-label');
 
                 if (type === 'egg') {
-                    amountLabel.innerText = 'Anzahl Eier';
+                    amountLabel.innerText = trans.num_eggs;
                     amountHelp.innerText = '';
                     costGroup.style.display = 'none';
-                    noteLabel.innerText = 'Notiz';
+                    noteLabel.innerText = trans.note;
                 } else if (type === 'food') {
-                    amountLabel.innerText = 'Gewicht (kg)';
+                    amountLabel.innerText = trans.weight;
                     amountHelp.innerText = '';
                     costGroup.style.display = 'block';
-                    noteLabel.innerText = 'Notiz (z.B. Marke)';
+                    noteLabel.innerText = trans.note_brand;
                 } else if (type === 'chicken') {
-                    amountLabel.innerText = 'Änderung Anzahl (+/-)';
-                    amountHelp.innerText = 'Positiv für Kauf, Negativ für Verlust/Verkauf';
+                    amountLabel.innerText = trans.change_amount;
+                    amountHelp.innerText = trans.help_change;
                     costGroup.style.display = 'block';
-                    noteLabel.innerText = 'Grund / Notiz';
+                    noteLabel.innerText = trans.reason_note;
                 }
             }
             // Initialize on load
