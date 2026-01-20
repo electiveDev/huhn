@@ -154,8 +154,19 @@ def get_statistics():
 
         # --- Egg Stats ---
         total_eggs = eggs_df['amount'].sum()
-        days_recorded = eggs_df['date'].nunique()
-        avg_eggs_day = total_eggs / days_recorded if days_recorded > 0 else 0
+
+        # Calculate days recorded from the first entry in the DB to today (or last entry)
+        if not df.empty:
+            start_date = df['date'].min()
+            end_date = pd.Timestamp.now().normalize()
+            # If records exist in the future, extend end_date
+            if df['date'].max() > end_date:
+                end_date = df['date'].max()
+
+            days_tracking = (end_date - start_date).days + 1
+            avg_eggs_day = total_eggs / days_tracking if days_tracking > 0 else 0
+        else:
+            avg_eggs_day = 0
 
         if not eggs_df.empty:
             eggs_df['month'] = eggs_df['date'].dt.to_period('M')
