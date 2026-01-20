@@ -1,79 +1,79 @@
-# Chicken Tracker (Hühner-Tracker)
+# Chicken Tracker (Hühner Tracker)
 
-Eine einfache, funktionale Webanwendung zur Erfassung der Hühnereierproduktion und der Futterkosten. Diese Anwendung hilft Ihnen bei der Berechnung der durchschnittlichen Eierproduktion (pro Tag, Monat, Jahr) und der Futterkosten, wobei alles in einer einfachen CSV-Datei gespeichert wird.
+A simple, functional web application to track chicken egg production and food costs. This application helps you calculate average egg production (per day, month, year) and food costs, storing everything in a simple CSV file.
 
-Die Benutzeroberfläche der Anwendung ist vollständig auf Deutsch lokalisiert.
+The application interface is fully localized in German.
 
-## Funktionen
+## Features
 
-- **Dashboard**: Sehen Sie wichtige Statistiken auf einen Blick:
-  - Durchschnittliche Eier pro Tag
-  - Durchschnittliche Eier pro Monat
-  - Durchschnittliche Eier pro Jahr
-  - Durchschnittliche Futterkosten pro Monat
-  - Gesamtzahl Eier und Gesamtkosten
-- **Dateneingabe**: Einfaches Formular zum Hinzufügen von Einträgen (Eier, Futter, Hühner).
-- **Verwaltung der Einträge**: Ansehen, Bearbeiten und Löschen vorhandener Einträge.
-- **Einfache Speicherung**: Daten werden in einer lokalen CSV-Datei (`data/data.csv`) gespeichert, was die Sicherung oder externe Bearbeitung erleichtert.
-- **Responsive Benutzeroberfläche**: Erstellt mit Bootstrap 5 für Kompatibilität auf Mobilgeräten und Desktops.
+- **Dashboard**: View key statistics at a glance:
+  - Average Eggs per Day
+  - Average Eggs per Month
+  - Average Eggs per Year
+  - Average Food Cost per Month
+  - Total Eggs and Total Cost
+- **Data Entry**: Easy form to add daily records (Date, Eggs Laid, Food Cost).
+- **Record Management**: View, Edit, and Delete existing records.
+- **Simple Storage**: Data is persisted in a local CSV file (`data/data.csv`), making it easy to backup or manipulate externally.
+- **Responsive UI**: Built with Bootstrap 5 for mobile and desktop compatibility.
 
-## Voraussetzungen
+## Prerequisites
 
 - **Python 3.8+**
-- **pip** (Python-Paketmanager)
+- **pip** (Python package installer)
 
 ## Installation
 
-1. **Repository klonen:**
+1. **Clone the repository:**
    ```bash
    git clone <repository-url>
    cd chicken-tracker
    ```
 
-2. **Virtuelle Umgebung erstellen (optional, aber empfohlen):**
+2. **Create a virtual environment (optional but recommended):**
    ```bash
    python -m venv venv
-   # Unter Windows
+   # On Windows
    venv\Scripts\activate
-   # Unter macOS/Linux
+   # On macOS/Linux
    source venv/bin/activate
    ```
 
-3. **Abhängigkeiten installieren:**
+3. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-## Starten der Anwendung
+## Running the Application
 
-1. **Starten des Flask-Servers:**
+1. **Start the Flask server:**
    ```bash
    python app.py
    ```
 
-2. **Zugriff auf die Anwendung:**
-   Öffnen Sie Ihren Webbrowser und navigieren Sie zu:
+2. **Access the application:**
+   Open your web browser and navigate to:
    [http://localhost:5000](http://localhost:5000)
 
-## Tests ausführen
+## Running Tests
 
-Das Projekt enthält Unit-Tests, um die Datenverarbeitungslogik und die Anwendungsrouten zu überprüfen.
+The project includes unit tests to verify the data handling logic and application routes.
 
-Um die Tests auszuführen:
+To run the tests:
 ```bash
 python -m unittest discover tests
 ```
 
-## Projektstruktur
+## Project Structure
 
-- `app.py`: Haupt-Flask-Anwendungsdatei, die die Routen definiert.
-- `data_handler.py`: Logik zum Lesen/Schreiben von CSV und zur Berechnung von Statistiken.
-- `templates/`: HTML-Vorlagen (Jinja2) für das Frontend.
-- `static/`: Statische Dateien (CSS).
-- `data/`: Verzeichnis, in dem `data.csv` gespeichert wird.
-- `tests/`: Unit-Tests.
+- `app.py`: Main Flask application file defining routes.
+- `data_handler.py`: Logic for reading/writing CSV and calculating statistics.
+- `templates/`: HTML templates (Jinja2) for the frontend.
+- `static/`: Static files (CSS).
+- `data/`: Directory where `data.csv` is stored.
+- `tests/`: Unit tests.
 
-## Datenspeicherung
+## Data Storage
 
-Alle Daten werden in `data/data.csv` gespeichert. Die Datei wird automatisch erstellt, wenn Sie Ihren ersten Eintrag hinzufügen.
-Format: `id,date,type,amount,cost,note`
+All data is stored in `data/data.csv`. The file is automatically created when you add your first record.
+Format: `id,date,eggs,food_cost`
