@@ -7,14 +7,20 @@ The user interface is fully bilingual (German/English) and can be toggled via th
 ## Features
 
 - **Dashboard**: See key statistics at a glance:
-  - Average eggs per day
-  - Average eggs per month
-  - Average eggs per year
-  - Average food costs per month
-  - Total eggs and total costs
-- **Data Entry**: Simple form to add daily entries (date, eggs laid, food costs).
+  - **Stock**: Current number of chickens.
+  - **Production**: Average eggs per day.
+  - **Efficiency**: Cost per egg (calculated from total food and chicken costs).
+  - **Costs**:
+    - Average food costs per month and year.
+    - Current year's food cost.
+    - Total costs (food + chicken purchases).
+- **Data Entry**: Simple tabbed forms to add:
+  - **Eggs**: Daily egg count.
+  - **Food**: Food purchase (weight and cost).
+  - **Chickens**: Stock changes (buy/sell/loss) with associated costs.
 - **Entry Management**: View, edit, and delete existing entries.
 - **Multilingual**: Switch between German and English at any time.
+- **Dark Mode**: Designed with a dark theme for comfortable viewing.
 - **Simple Storage**: Data is stored in a local CSV file (`data/data.csv`), making backup or external editing easy.
 - **Responsive UI**: Built with Bootstrap 5 for mobile and desktop compatibility.
 
@@ -79,3 +85,9 @@ python -m unittest discover tests
 
 All data is stored in `data/data.csv`. The file is automatically created when you add your first entry.
 Format: `id,date,type,amount,cost,note`
+
+- `type`: 'egg', 'food', or 'chicken'.
+- `amount`: Polymorphic field.
+  - For `egg` and `chicken`: Integer (quantity).
+  - For `food`: Float (weight in kg).
+- `cost`: Monetary value in €.
