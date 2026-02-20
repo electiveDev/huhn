@@ -4,6 +4,7 @@ import os
 from translations import TRANSLATIONS
 
 app = Flask(__name__)
+# Lokaler Key (Sicherheit für lokale Instanz ausreichend)
 app.secret_key = 'dev_key_123'
 
 @app.before_request
@@ -18,6 +19,12 @@ def inject_language():
         return TRANSLATIONS.get(lang, {}).get(key, key)
     return dict(language=session.get('language', 'de'), t=t)
 
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    if lang in TRANSLATIONS:
+        session['language'] = lang
+    return redirect(request.referrer or url_for('index'))
+
 @app.route('/')
 def index():
     stats = get_statistics()
@@ -31,13 +38,16 @@ def add():
     amount = request.form.get('amount')
     cost = request.form.get('cost')
     note = request.form.get('note', '')
+
     if date and record_type:
         add_record(date, record_type, amount, cost, note)
+
     return redirect(url_for('index'))
 
 @app.route('/records')
 def records():
-    return render_template('records.html', records=get_all_records())
+    all_records = get_all_records()
+    return render_template('records.html', records=all_records)
 
 @app.route('/edit/<id>')
 def edit(id):
@@ -49,10 +59,16 @@ def edit(id):
 @app.route('/update/<id>', methods=['POST'])
 def update(id):
     date = request.form.get('date')
+    existing_record = get_record(id)
+    
+    if not existing_record:
+        return redirect(url_for('records'))
+
+    record_type = request.form.get('type', existing_record.get('type'))
     amount = request.form.get('amount', 0)
     cost = request.form.get('cost', 0.0)
     note = request.form.get('note', '')
-    record_type = request.form.get('type')
+
     update_record(id, date, amount, cost, note, record_type)
     return redirect(url_for('records'))
 
@@ -62,4 +78,5 @@ def delete(id):
     return redirect(url_for('records'))
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
