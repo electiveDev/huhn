@@ -141,7 +141,8 @@ def delete_record(record_id):
 def get_statistics():
     try:
         df = _get_data()
-        if df.empty: return _empty_stats()
+        if df.empty:
+            return _empty_stats()
         
         eggs_df = df[df['type'] == 'egg']
         food_df = df[df['type'] == 'food']
@@ -150,12 +151,19 @@ def get_statistics():
         total_eggs = eggs_df['amount'].sum()
         current_chickens = chicken_df['amount'].sum()
         
-        start_date = df['date'].min()
-        end_date = max(pd.Timestamp.now().normalize(), df['date'].max())
+        start_date = df['date'].min().normalize()
+        today = pd.Timestamp.now().normalize()
+        end_date = max(today, df['date'].max().normalize())
         days = (end_date - start_date).days + 1
-        
+
         total_food_cost = food_df['cost'].sum()
         total_chicken_cost = chicken_df['cost'].sum()
+
+        current_year = today.year
+        food_cost_current_year = food_df[food_df['date'].dt.year == current_year]['cost'].sum() if not food_df.empty else 0.0
+
+        month_span = max(1, (end_date.year - start_date.year) * 12 + (end_date.month - start_date.month) + 1)
+        year_span = max(1, end_date.year - start_date.year + 1)
 
         return {
             'avg_eggs_day': round(total_eggs / days if days > 0 else 0, 2),
@@ -164,10 +172,24 @@ def get_statistics():
             'total_eggs': int(total_eggs),
             'total_food_cost': round(total_food_cost, 2),
             'total_chicken_cost': round(total_chicken_cost, 2),
-            'avg_food_cost_month': round(total_food_cost / (max(1, days/30)), 2)
+            'avg_food_cost_month': round(total_food_cost / month_span, 2),
+            'food_cost_current_year': round(food_cost_current_year, 2),
+            'avg_food_cost_year': round(total_food_cost / year_span, 2),
         }
     except Exception:
         return _empty_stats()
 
 def _empty_stats():
-    return {k: 0 for k in ['avg_eggs_day', 'current_chickens', 'cost_per_egg', 'total_eggs', 'total_food_cost', 'total_chicken_cost', 'avg_food_cost_month']}
+    return {
+        k: 0 for k in [
+            'avg_eggs_day',
+            'current_chickens',
+            'cost_per_egg',
+            'total_eggs',
+            'total_food_cost',
+            'total_chicken_cost',
+            'avg_food_cost_month',
+            'food_cost_current_year',
+            'avg_food_cost_year',
+        ]
+    }

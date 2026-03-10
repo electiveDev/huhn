@@ -1,11 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from data_handler import get_statistics, add_record, get_all_records, get_record, update_record, delete_record
 import os
+import secrets
 from translations import TRANSLATIONS
 
 app = Flask(__name__)
-# Lokaler Key (Sicherheit für lokale Instanz ausreichend)
-app.secret_key = 'dev_key_123'
+app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+)
 
 @app.before_request
 def before_request():

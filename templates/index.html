@@ -157,43 +157,53 @@
 
     <div class="col-md-6">
         <h3>{{ t('title_latest_records') }}</h3>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>{{ t('th_date') }}</th>
-                    <th>{{ t('th_type') }}</th>
-                    <th>{{ t('th_value') }}</th>
-                    <th>{{ t('th_note') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for record in records %}
-                <tr>
-                    <td>{{ record.date }}</td>
-                    <td>
-                        {% if record.type == 'egg' %}
-                            <span class="badge bg-primary">{{ t('badge_eggs') }}</span>
-                        {% elif record.type == 'food' %}
-                            <span class="badge bg-warning text-dark">{{ t('badge_food') }}</span>
-                        {% elif record.type == 'chicken' %}
-                            <span class="badge bg-info text-dark">{{ t('badge_chickens') }}</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if record.type == 'egg' %}
-                            {{ record.amount }} {{ t('unit_pcs') }}
-                        {% elif record.type == 'food' %}
-                            {{ record.amount }} kg ({{ record.cost }} €)
-                        {% elif record.type == 'chicken' %}
-                            {{ record.amount }} ({{ record.cost }} €)
-                        {% endif %}
-                    </td>
-                    <td>{{ record.note }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <a href="{{ url_for('records') }}" class="btn btn-secondary">{{ t('btn_view_all') }}</a>
+        {% if records %}
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>{{ t('th_date') }}</th>
+                        <th>{{ t('th_type') }}</th>
+                        <th>{{ t('th_value') }}</th>
+                        <th>{{ t('th_note') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>{{ record.date }}</td>
+                        <td>
+                            {% if record.type == 'egg' %}
+                                <span class="badge bg-primary">{{ t('badge_eggs') }}</span>
+                            {% elif record.type == 'food' %}
+                                <span class="badge bg-warning text-dark">{{ t('badge_food') }}</span>
+                            {% elif record.type == 'chicken' %}
+                                <span class="badge bg-info text-dark">{{ t('badge_chickens') }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.type == 'egg' %}
+                                {{ record.amount }} {{ t('unit_pcs') }}
+                            {% elif record.type == 'food' %}
+                                {{ record.amount }} kg ({{ record.cost }} €)
+                            {% elif record.type == 'chicken' %}
+                                {{ record.amount }} ({{ record.cost }} €)
+                            {% endif %}
+                        </td>
+                        <td>{{ record.note }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="card border-secondary-subtle bg-body-tertiary">
+            <div class="card-body text-body-secondary">
+                {{ t('empty_latest_records') }}
+            </div>
+        </div>
+        {% endif %}
+        <a href="{{ url_for('records') }}" class="btn btn-secondary mt-3">{{ t('btn_view_all') }}</a>
     </div>
 </div>
 

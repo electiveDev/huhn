@@ -1,2 +1,9 @@
 body { padding-bottom: 20px; }
 .card-header { font-weight: bold; }
+.navbar .nav-link.active {
+  font-weight: 600;
+}
+.table td,
+.table th {
+  vertical-align: middle;
+}

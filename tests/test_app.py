@@ -44,5 +44,10 @@ class TestApp(unittest.TestCase):
         self.assertEqual(df.iloc[0]['cost'], 25.50)
         self.assertEqual(df.iloc[0]['note'], '25kg sack')
 
+    def test_session_configuration(self):
+        self.assertTrue(app.config['SESSION_COOKIE_HTTPONLY'])
+        self.assertEqual(app.config['SESSION_COOKIE_SAMESITE'], 'Lax')
+        self.assertNotEqual(app.secret_key, 'dev_key_123')
+
 if __name__ == '__main__':
     unittest.main()
